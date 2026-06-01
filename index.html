@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm-Q — Smart AI Agriculture Assistant</title>
+  <!-- Google Fonts & Material Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- App Container -->
+  <div class="app-container">
+    
+    <!-- Top Navigation Bar -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo">
+          <span class="material-icons-round">spa</span>
+        </div>
+        <div class="brand-text">
+          <h1>Farm-Q</h1>
+          <p>Smart AI Agriculture Assistant</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <div class="api-status-badge id="apiStatusBadge" onclick="openSettings()">
+          <span class="status-dot"></span>
+          <span class="status-text">Set API Key</span>
+        </div>
+        <button class="icon-btn theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+          <span class="material-icons-round">dark_mode</span>
+        </button>
+        <button class="btn btn-icon settings-btn" onclick="openSettings()">
+          <span class="material-icons-round">settings</span>
+          <span>Settings</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <div class="app-workspace">
+      
+      <!-- Left Panel: Sidebar Controls -->
+      <aside class="workspace-sidebar">
+        
+        <!-- Navigation Menu -->
+        <nav class="sidebar-nav">
+          <button class="nav-item active" onclick="switchTab('diagnose')">
+            <span class="material-icons-round">analytics</span>
+            <span>Disease Diagnoser</span>
+          </button>
+          <button class="nav-item" onclick="switchTab('advisor')">
+            <span class="material-icons-round">wb_sunny</span>
+            <span>Smart Advisor</span>
+          </button>
+          <button class="nav-item" onclick="switchTab('chat')">
+            <span class="material-icons-round">forum</span>
+            <span>Ask Expert AI</span>
+          </button>
+        </nav>
+
+        <!-- Quick Info Widget -->
+        <div class="widget card">
+          <div class="widget-header">
+            <span class="material-icons-round">history</span>
+            <h3>Analysis History</h3>
+          </div>
+          <div class="history-list" id="historyList">
+            <div class="empty-state">
+              <p>No recent analyses found</p>
+            </div>
+          </div>
+          <button class="btn btn-text btn-sm" id="clearHistoryBtn" onclick="clearHistory()" style="margin-top: 10px; width: 100%; display: none;">
+            Clear History
+          </button>
+        </div>
+
+        <!-- Tip of the Day -->
+        <div class="widget tip-card card">
+          <div class="tip-icon">
+            <span class="material-icons-round">lightbulb</span>
+          </div>
+          <div class="tip-content">
+            <h4>Farmer's Tip</h4>
+            <p id="tipText">Crop rotation with legumes replenishes nitrogen levels in the soil naturally.</p>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Right Panel: Core Views -->
+      <main class="workspace-content">
+        
+        <!-- API Missing Alert (Banner) -->
+        <div class="alert-banner warning" id="apiMissingAlert">
+          <span class="material-icons-round">warning</span>
+          <div class="alert-text">
+            <strong>Gemini API Key Required:</strong> To enable real-time AI disease diagnosis and weather advisory, please click Settings and add your Google Gemini API Key.
+          </div>
+          <button class="btn btn-sm btn-warning" onclick="openSettings()">Configure</button>
+        </div>
+
+        <!-- 1. DISEASE DIAGNOSER TAB -->
+        <section class="tab-view active" id="tab-diagnose">
+          <div class="view-header">
+            <h2>Leaf & Crop Disease Diagnoser</h2>
+            <p>Upload a clear photo of an infected leaf or crop to identify disease symptoms, causes, and get treatment options.</p>
+          </div>
+
+          <div class="grid-2-col">
+            <!-- Diagnosis Form -->
+            <div class="card form-card">
+              <div class="form-group">
+                <label for="cropType">Select Crop Type</label>
+                <div class="select-wrapper">
+                  <select id="cropType">
+                    <option value="">-- Choose Crop --</option>
+                    <option value="Tomato">Tomato</option>
+                    <option value="Potato">Potato</option>
+                    <option value="Rice">Rice</option>
+                    <option value="Wheat">Wheat</option>
+                    <option value="Maize">Maize / Corn</option>
+                    <option value="Grapes">Grapes</option>
+                    <option value="Apple">Apple</option>
+                    <option value="Cotton">Cotton</option>
+                    <option value="Other">Other / Unknown</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Custom Drag & Drop Image Uploader -->
+              <div class="form-group">
+                <label>Upload Leaf Photo</label>
+                <div class="upload-zone" id="uploadZone" onclick="triggerFileInput()">
+                  <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                  <div class="upload-zone-content" id="uploadPrompt">
+                    <span class="material-icons-round upload-icon">cloud_upload</span>
+                    <h3>Drag & drop crop image here</h3>
+                    <p>Supports PNG, JPG, JPEG (Max 5MB)</p>
+                    <button class="btn btn-secondary btn-sm" type="button">Browse Files</button>
+                  </div>
+                  <div class="image-preview-container" id="previewContainer" style="display: none;">
+                    <img id="imagePreview" src="" alt="Crop leaf preview">
+                    <button class="remove-img-btn" type="button" onclick="removeUploadedImage(event)">
+                      <span class="material-icons-round">close</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="symptomsDesc">Describe Symptoms (Optional)</label>
+                <textarea id="symptomsDesc" placeholder="e.g., Brown spots on leaves with yellow halos, spreading from bottom leaves..."></textarea>
+              </div>
+
+              <button class="btn btn-primary btn-block" id="diagnoseBtn" onclick="runDiagnosis()">
+                <span class="material-icons-round">troubleshoot</span>
+                <span>Analyze Leaf & Get Advice</span>
+              </button>
+            </div>
+
+            <!-- Diagnosis Result Card -->
+            <div class="card result-card" id="diagnosisResult">
+              <div class="result-placeholder" id="diagnosisPlaceholder">
+                <span class="material-icons-round">biotech</span>
+                <h3>Waiting for Input</h3>
+                <p>Select a crop, upload an image, and click "Analyze Leaf" to generate your AI agricultural report.</p>
+              </div>
+
+              <!-- Spinner -->
+              <div class="result-loading" id="diagnosisLoading" style="display: none;">
+                <div class="spinner"></div>
+                <h3>Analyzing Crop Image</h3>
+                <p>Generating diagnosis, treatment recommendations, and speech options...</p>
+              </div>
+
+              <!-- Actual Report Structure -->
+              <div class="report-content" id="reportContent" style="display: none;">
+                <div class="report-header">
+                  <div class="report-title-area">
+                    <span class="report-badge">AI Diagnostic Report</span>
+                    <h3 id="reportTitle">Disease Identified</h3>
+                    <p id="reportMeta">Crop: Tomato | Date: June 1, 2026</p>
+                  </div>
+                  
+                  <!-- Speech Controls -->
+                  <div class="speech-controls-card">
+                    <button class="icon-btn" id="playAudioBtn" onclick="toggleAudioAdvice()" title="Read Aloud">
+                      <span class="material-icons-round">volume_up</span>
+                    </button>
+                    <div class="select-wrapper select-sm">
+                      <select id="audioLang" onchange="changeAudioLanguage()">
+                        <option value="en-US">English</option>
+                        <option value="hi-IN">Hindi</option>
+                        <option value="te-IN">Telugu</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="report-body" id="reportMarkdown">
+                  <!-- Injected via JavaScript -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. SMART ADVISOR TAB -->
+        <section class="tab-view" id="tab-advisor">
+          <div class="view-header">
+            <h2>Weather-Aware Smart Advisory</h2>
+            <p>Enter your crop and location to receive weather forecasts and custom advisory checklists (irrigation, fertilization, etc.).</p>
+          </div>
+
+          <div class="grid-2-col">
+            <!-- Advisory Input -->
+            <div class="card form-card">
+              <div class="form-group">
+                <label for="advisorCrop">Crop Type</label>
+                <div class="select-wrapper">
+                  <select id="advisorCrop">
+                    <option value="">-- Choose Crop --</option>
+                    <option value="Tomato">Tomato</option>
+                    <option value="Potato">Potato</option>
+                    <option value="Rice">Rice</option>
+                    <option value="Wheat">Wheat</option>
+                    <option value="Maize">Maize / Corn</option>
+                    <option value="Grapes">Grapes</option>
+                    <option value="Apple">Apple</option>
+                    <option value="Other">Other / Unknown</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="advisorLocation">Location (City / State / Region)</label>
+                <div class="input-icon-wrapper">
+                  <span class="material-icons-round input-icon">place</span>
+                  <input type="text" id="advisorLocation" placeholder="e.g., Pune, Maharashtra or Hyderabad, Telangana">
+                </div>
+              </div>
+
+              <button class="btn btn-primary btn-block" id="advisorBtn" onclick="runAdvisory()">
+                <span class="material-icons-round">cloud</span>
+                <span>Get Weather & Advisory</span>
+              </button>
+            </div>
+
+            <!-- Advisory Result Card -->
+            <div class="card result-card" id="advisorResult">
+              <div class="result-placeholder" id="advisorPlaceholder">
+                <span class="material-icons-round">cloud_queue</span>
+                <h3>Weather Advisory Ready</h3>
+                <p>Provide your crop and location, then click the button to load live/simulated agricultural forecasts.</p>
+              </div>
+
+              <div class="result-loading" id="advisorLoading" style="display: none;">
+                <div class="spinner"></div>
+                <h3>Fetching Weather & Advice</h3>
+                <p>Processing meteorological factors and crop growth cycles...</p>
+              </div>
+
+              <!-- Actual Advisory Structure -->
+              <div class="report-content" id="advisorContent" style="display: none;">
+                <!-- Weather Widget -->
+                <div class="weather-widget-card" id="weatherWidget">
+                  <div class="weather-main">
+                    <span class="material-icons-round weather-icon" id="weatherIcon">wb_sunny</span>
+                    <div>
+                      <h3 id="weatherTemp">32°C</h3>
+                      <p id="weatherDesc">Partly Cloudy</p>
+                    </div>
+                  </div>
+                  <div class="weather-meta">
+                    <div class="meta-item">
+                      <span class="material-icons-round">water_drop</span>
+                      <div>
+                        <span>Humidity</span>
+                        <strong id="weatherHumidity">65%</strong>
+                      </div>
+                    </div>
+                    <div class="meta-item">
+                      <span class="material-icons-round">air</span>
+                      <div>
+                        <span>Wind Speed</span>
+                        <strong id="weatherWind">12 km/h</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="report-body" id="advisorMarkdown" style="margin-top: 20px;">
+                  <!-- Injected via JavaScript -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. ASK EXPERT AI (CHAT) TAB -->
+        <section class="tab-view" id="tab-chat">
+          <div class="view-header">
+            <h2>Ask Farm-Q Expert AI</h2>
+            <p>Ask anything about seeds, soil testing, fertilizer application, irrigation practices, or crop protection.</p>
+          </div>
+
+          <div class="card chat-card-container">
+            <!-- Chat Window -->
+            <div class="chat-window-box" id="chatWindow">
+              <div class="chat-message bot">
+                <div class="chat-avatar">
+                  <span class="material-icons-round">spa</span>
+                </div>
+                <div class="chat-bubble">
+                  <p>Hello! I am your Farm-Q Agricultural Advisor. How can I help you today? You can ask me about soil health, pest control, irrigation, or fertilizer guidance.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Inputs -->
+            <div class="chat-input-bar">
+              <input type="text" id="chatInput" placeholder="Ask a question about your farm..." onkeydown="handleChatKey(event)">
+              <button class="btn btn-primary btn-round" onclick="sendChatMessage()">
+                <span class="material-icons-round">send</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="material-icons-round text-primary">key</span>
+          <h2>Gemini API Credentials</h2>
+        </div>
+        <button class="icon-btn" onclick="closeSettings()">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>To enable real-time AI capabilities, configure a Google Gemini API Key. Your key is stored securely in your local browser cache (`localStorage`) and is never sent to any external server other than Google's Gemini endpoint.</p>
+        
+        <div class="form-group" style="margin-top: 15px;">
+          <label for="apiKeyInput">Gemini API Key</label>
+          <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
+          <p class="input-help-text">You can get a free API key from the <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a>.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeSettings()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSettings()">Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
