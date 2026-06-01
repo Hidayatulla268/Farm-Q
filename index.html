@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farm-Q — Smart AI Agriculture Assistant</title>
+  <title>Farm-Q — Intelligent Agricultural Dashboard</title>
   <!-- Google Fonts & Material Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,27 +13,38 @@
 </head>
 <body>
 
-  <!-- App Container -->
+  <!-- Animated Floating Leaf Particles in background -->
+  <div class="leaf-particles-container" id="leafParticles"></div>
+
+  <!-- App Main Frame -->
   <div class="app-container">
     
-    <!-- Top Navigation Bar -->
+    <!-- Top Animated Header -->
     <header class="app-header">
       <div class="brand">
-        <div class="brand-logo">
+        <div class="brand-logo pulse-glow">
           <span class="material-icons-round">spa</span>
         </div>
         <div class="brand-text">
           <h1>Farm-Q</h1>
-          <p>Smart AI Agriculture Assistant</p>
+          <p>Intelligent Agricultural Cockpit</p>
+        </div>
+      </div>
+
+      <!-- Live Ticker (News & Tips) -->
+      <div class="ticker-wrap">
+        <div class="ticker-title">Updates:</div>
+        <div class="ticker">
+          <div class="ticker-item" id="tickerText">Optimal crop season for cotton in central India. Check soil pH!</div>
         </div>
       </div>
       
       <div class="header-actions">
-        <div class="api-status-badge id="apiStatusBadge" onclick="openSettings()">
+        <div class="api-status-badge" id="apiStatusBadge" onclick="openSettings()">
           <span class="status-dot"></span>
           <span class="status-text">Set API Key</span>
         </div>
-        <button class="icon-btn theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+        <button class="icon-btn theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
           <span class="material-icons-round">dark_mode</span>
         </button>
         <button class="btn btn-icon settings-btn" onclick="openSettings()">
@@ -43,52 +54,69 @@
       </div>
     </header>
 
-    <!-- Main Workspace Grid -->
+    <!-- Workspace Grid -->
     <div class="app-workspace">
       
-      <!-- Left Panel: Sidebar Controls -->
+      <!-- Left Panel: Sidebar Nav -->
       <aside class="workspace-sidebar">
         
-        <!-- Navigation Menu -->
         <nav class="sidebar-nav">
-          <button class="nav-item active" onclick="switchTab('diagnose')">
-            <span class="material-icons-round">analytics</span>
-            <span>Disease Diagnoser</span>
+          <button class="nav-item active" onclick="switchTab('dashboard')">
+            <span class="material-icons-round">dashboard</span>
+            <span>Dashboard</span>
+          </button>
+          <button class="nav-item" onclick="switchTab('diagnose')">
+            <span class="material-icons-round">biotech</span>
+            <span>Disease Lab</span>
+          </button>
+          <button class="nav-item" onclick="switchTab('soil')">
+            <span class="material-icons-round">science</span>
+            <span>Soil Analyst</span>
           </button>
           <button class="nav-item" onclick="switchTab('advisor')">
             <span class="material-icons-round">wb_sunny</span>
-            <span>Smart Advisor</span>
+            <span>Microclimate Info</span>
           </button>
           <button class="nav-item" onclick="switchTab('chat')">
             <span class="material-icons-round">forum</span>
-            <span>Ask Expert AI</span>
+            <span>Botanical Chat</span>
+          </button>
+          <button class="nav-item" onclick="switchTab('recipes')">
+            <span class="material-icons-round">menu_book</span>
+            <span>Recipe Book</span>
           </button>
         </nav>
 
-        <!-- Quick Info Widget -->
-        <div class="widget card">
+        <!-- Sidebar Widgets -->
+        <div class="widget card history-widget">
           <div class="widget-header">
             <span class="material-icons-round">history</span>
-            <h3>Analysis History</h3>
+            <h3>Lab Analysis Records</h3>
           </div>
           <div class="history-list" id="historyList">
             <div class="empty-state">
-              <p>No recent analyses found</p>
+              <p>No recent reports found</p>
             </div>
           </div>
           <button class="btn btn-text btn-sm" id="clearHistoryBtn" onclick="clearHistory()" style="margin-top: 10px; width: 100%; display: none;">
-            Clear History
+            Clear Records
           </button>
         </div>
 
-        <!-- Tip of the Day -->
-        <div class="widget tip-card card">
-          <div class="tip-icon">
-            <span class="material-icons-round">lightbulb</span>
+        <!-- Quick Status Card -->
+        <div class="widget progress-widget card">
+          <div class="widget-header">
+            <span class="material-icons-round">eco</span>
+            <h3>System Status</h3>
           </div>
-          <div class="tip-content">
-            <h4>Farmer's Tip</h4>
-            <p id="tipText">Crop rotation with legumes replenishes nitrogen levels in the soil naturally.</p>
+          <div class="status-indicator">
+            <div class="status-row">
+              <span>Soil Health Index</span>
+              <span id="sidebarSoilIndex">Optimal</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" style="width: 82%;"></div>
+            </div>
           </div>
         </div>
 
@@ -97,27 +125,109 @@
       <!-- Right Panel: Core Views -->
       <main class="workspace-content">
         
-        <!-- API Missing Alert (Banner) -->
+        <!-- API Alert -->
         <div class="alert-banner warning" id="apiMissingAlert">
-          <span class="material-icons-round">warning</span>
+          <span class="material-icons-round animate-bounce">warning</span>
           <div class="alert-text">
-            <strong>Gemini API Key Required:</strong> To enable real-time AI disease diagnosis and weather advisory, please click Settings and add your Google Gemini API Key.
+            <strong>Gemini AI Integration Needed:</strong> Configure your API key to activate visual disease diagnostics, soil analysis summaries, and expert consultations.
           </div>
-          <button class="btn btn-sm btn-warning" onclick="openSettings()">Configure</button>
+          <button class="btn btn-sm btn-warning" onclick="openSettings()">Set Key</button>
         </div>
 
-        <!-- 1. DISEASE DIAGNOSER TAB -->
-        <section class="tab-view active" id="tab-diagnose">
+        <!-- VIEW 1: DASHBOARD OVERVIEW -->
+        <section class="tab-view active" id="tab-dashboard">
           <div class="view-header">
-            <h2>Leaf & Crop Disease Diagnoser</h2>
-            <p>Upload a clear photo of an infected leaf or crop to identify disease symptoms, causes, and get treatment options.</p>
+            <h2>Welcome to Farm-Q Cockpit</h2>
+            <p>Your centralized workspace for intelligent agronomy, automated diagnostic analysis, and soil management.</p>
+          </div>
+
+          <!-- Quick Stats Cards (Animated) -->
+          <div class="dashboard-stats-grid">
+            <div class="stat-card card hover-scale" onclick="switchTab('diagnose')">
+              <div class="stat-icon-wrap bg-emerald">
+                <span class="material-icons-round">camera_alt</span>
+              </div>
+              <div class="stat-info">
+                <h3>Disease Lab</h3>
+                <p>Upload leaf photo for diagnosis</p>
+              </div>
+              <span class="material-icons-round arrow-icon">chevron_right</span>
+            </div>
+
+            <div class="stat-card card hover-scale" onclick="switchTab('soil')">
+              <div class="stat-icon-wrap bg-amber">
+                <span class="material-icons-round">assessment</span>
+              </div>
+              <div class="stat-info">
+                <h3>Soil Analyst</h3>
+                <p>Check N-P-K nutrient adequacy</p>
+              </div>
+              <span class="material-icons-round arrow-icon">chevron_right</span>
+            </div>
+
+            <div class="stat-card card hover-scale" onclick="switchTab('recipes')">
+              <div class="stat-icon-wrap bg-sky">
+                <span class="material-icons-round">history_edu</span>
+              </div>
+              <div class="stat-info">
+                <h3>Recipe Book</h3>
+                <p>View botanical treatments</p>
+              </div>
+              <span class="material-icons-round arrow-icon">chevron_right</span>
+            </div>
+          </div>
+
+          <!-- Mid Dashboard Grid -->
+          <div class="grid-2-col" style="margin-top: 10px;">
+            <!-- Weather Overview Widget -->
+            <div class="card weather-summary-card">
+              <div class="widget-header">
+                <span class="material-icons-round">wb_cloudy</span>
+                <h3>Simulated Location Climate</h3>
+              </div>
+              <div class="weather-brief-row">
+                <span class="material-icons-round brief-weather-icon">wb_sunny</span>
+                <div>
+                  <h4 id="dashWeatherTemp">32°C</h4>
+                  <p id="dashWeatherDesc">Partly Cloudy · High Humidity</p>
+                </div>
+              </div>
+              <p class="small text-muted" style="margin-top: 10px;">Based on current monsoon cycles. Click Microclimate info tab to fetch detailed forecasts and custom checklists.</p>
+              <button class="btn btn-secondary btn-sm" onclick="switchTab('advisor')" style="margin-top: 12px; width: 100%;">
+                Open Microclimate Advisor
+              </button>
+            </div>
+
+            <!-- Agricultural Tip Panel -->
+            <div class="card interactive-tip-card">
+              <div class="widget-header">
+                <span class="material-icons-round">tips_and_updates</span>
+                <h3>Agronomist Advisory</h3>
+              </div>
+              <div class="tip-body">
+                <p id="dashTipText">Soil pH levels dictate how efficiently crops draw nutrients. If your soil pH falls below 6.0, phosphorus becomes locked, reducing wheat and tomato yields.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="rotateTip()" style="margin-top: 12px; width: 100%;">
+                Next Tip
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 2: DISEASE LAB -->
+        <section class="tab-view" id="tab-diagnose">
+          <div class="view-header">
+            <h2>Disease Diagnostic Lab</h2>
+            <p>Perform plant pathology testing. Upload an image, apply visual image adjustments, select symptoms, and execute analysis.</p>
           </div>
 
           <div class="grid-2-col">
-            <!-- Diagnosis Form -->
+            <!-- Form Card -->
             <div class="card form-card">
+              
+              <!-- Select Crop -->
               <div class="form-group">
-                <label for="cropType">Select Crop Type</label>
+                <label for="cropType">Select Target Crop</label>
                 <div class="select-wrapper">
                   <select id="cropType">
                     <option value="">-- Choose Crop --</option>
@@ -134,64 +244,106 @@
                 </div>
               </div>
 
-              <!-- Custom Drag & Drop Image Uploader -->
+              <!-- Upload Zone & Image Editor Canvas -->
               <div class="form-group">
-                <label>Upload Leaf Photo</label>
+                <label>Leaf Image Workspace</label>
                 <div class="upload-zone" id="uploadZone" onclick="triggerFileInput()">
                   <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
                   <div class="upload-zone-content" id="uploadPrompt">
-                    <span class="material-icons-round upload-icon">cloud_upload</span>
-                    <h3>Drag & drop crop image here</h3>
-                    <p>Supports PNG, JPG, JPEG (Max 5MB)</p>
+                    <span class="material-icons-round upload-icon">photo_camera</span>
+                    <h3>Upload Leaf/Crop Photograph</h3>
+                    <p>PNG, JPG, JPEG (Max 5MB)</p>
                     <button class="btn btn-secondary btn-sm" type="button">Browse Files</button>
                   </div>
-                  <div class="image-preview-container" id="previewContainer" style="display: none;">
-                    <img id="imagePreview" src="" alt="Crop leaf preview">
-                    <button class="remove-img-btn" type="button" onclick="removeUploadedImage(event)">
+                  
+                  <div class="image-preview-container" id="previewContainer" style="display: none;" onclick="event.stopPropagation()">
+                    <!-- Canvas filter workspace -->
+                    <img id="imagePreview" src="" alt="Workspace Image" style="display:none;">
+                    <canvas id="editorCanvas"></canvas>
+                    <button class="remove-img-btn" type="button" onclick="removeUploadedImage(event)" title="Clear Image">
                       <span class="material-icons-round">close</span>
                     </button>
                   </div>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label for="symptomsDesc">Describe Symptoms (Optional)</label>
-                <textarea id="symptomsDesc" placeholder="e.g., Brown spots on leaves with yellow halos, spreading from bottom leaves..."></textarea>
+              <!-- Canvas Adjustments Panel (Shown only when image loaded) -->
+              <div class="canvas-controls-box" id="canvasControls" style="display: none;">
+                <h4>Image Workspace Filters</h4>
+                <div class="filter-slider-group">
+                  <div class="slider-row">
+                    <span>Brightness</span>
+                    <input type="range" id="filterBrightness" min="50" max="150" value="100" oninput="applyCanvasFilters()">
+                  </div>
+                  <div class="slider-row">
+                    <span>Contrast</span>
+                    <input type="range" id="filterContrast" min="50" max="150" value="100" oninput="applyCanvasFilters()">
+                  </div>
+                  <div class="slider-row">
+                    <span>Saturation</span>
+                    <input type="range" id="filterSaturation" min="0" max="200" value="100" oninput="applyCanvasFilters()">
+                  </div>
+                </div>
               </div>
 
-              <button class="btn btn-primary btn-block" id="diagnoseBtn" onclick="runDiagnosis()">
-                <span class="material-icons-round">troubleshoot</span>
-                <span>Analyze Leaf & Get Advice</span>
+              <!-- Symptom Selector Buttons -->
+              <div class="form-group">
+                <label>Select Observed Symptoms (Optional)</label>
+                <div class="symptom-tag-cloud" id="symptomCloud">
+                  <div class="symptom-tag" onclick="toggleSymptomTag(this)" data-symptom="Brown Spots">Brown Spots</div>
+                  <div class="symptom-tag" onclick="toggleSymptomTag(this)" data-symptom="Yellowing Leaves">Yellowing Leaves</div>
+                  <div class="symptom-tag" onclick="toggleSymptomTag(this)" data-symptom="Powdery Spots">Powdery Spots</div>
+                  <div class="symptom-tag" onclick="toggleSymptomTag(this)" data-symptom="Holes in leaves">Holes in Leaves</div>
+                  <div class="symptom-tag" onclick="toggleSymptomTag(this)" data-symptom="Leaf curling">Leaf Curling</div>
+                  <div class="symptom-tag" onclick="toggleSymptomTag(this)" data-symptom="Wilting stems">Wilting Stems</div>
+                  <div class="symptom-tag" onclick="toggleSymptomTag(this)" data-symptom="Stunted growth">Stunted Growth</div>
+                </div>
+              </div>
+
+              <!-- Text Description -->
+              <div class="form-group">
+                <label for="symptomsDesc">Additional Notes</label>
+                <textarea id="symptomsDesc" placeholder="e.g. spots appeared on lower leaves after heavy rainfall..."></textarea>
+              </div>
+
+              <button class="btn btn-primary btn-block ripple" id="diagnoseBtn" onclick="runDiagnosis()">
+                <span class="material-icons-round">science</span>
+                <span>Run Diagnostics</span>
               </button>
             </div>
 
-            <!-- Diagnosis Result Card -->
+            <!-- Report Output Card -->
             <div class="card result-card" id="diagnosisResult">
               <div class="result-placeholder" id="diagnosisPlaceholder">
                 <span class="material-icons-round">biotech</span>
-                <h3>Waiting for Input</h3>
-                <p>Select a crop, upload an image, and click "Analyze Leaf" to generate your AI agricultural report.</p>
+                <h3>Pathology Analysis Core</h3>
+                <p>Provide crop type, upload photos, filter images for visibility, select symptoms, and click Run Diagnostics.</p>
               </div>
 
-              <!-- Spinner -->
-              <div class="result-loading" id="diagnosisLoading" style="display: none;">
-                <div class="spinner"></div>
-                <h3>Analyzing Crop Image</h3>
-                <p>Generating diagnosis, treatment recommendations, and speech options...</p>
+              <!-- Skeleton Loader (Professional Animation) -->
+              <div class="skeleton-loader-container" id="diagnosisLoading" style="display: none;">
+                <div class="skeleton-header">
+                  <div class="skeleton-bar title-bar"></div>
+                  <div class="skeleton-bar subtitle-bar"></div>
+                </div>
+                <div class="skeleton-body">
+                  <div class="skeleton-line"></div>
+                  <div class="skeleton-line"></div>
+                  <div class="skeleton-line short-line"></div>
+                  <div class="skeleton-block"></div>
+                </div>
               </div>
 
-              <!-- Actual Report Structure -->
               <div class="report-content" id="reportContent" style="display: none;">
                 <div class="report-header">
                   <div class="report-title-area">
-                    <span class="report-badge">AI Diagnostic Report</span>
+                    <span class="report-badge">Diagnostic Output</span>
                     <h3 id="reportTitle">Disease Identified</h3>
                     <p id="reportMeta">Crop: Tomato | Date: June 1, 2026</p>
                   </div>
                   
-                  <!-- Speech Controls -->
                   <div class="speech-controls-card">
-                    <button class="icon-btn" id="playAudioBtn" onclick="toggleAudioAdvice()" title="Read Aloud">
+                    <button class="icon-btn" id="playAudioBtn" onclick="toggleAudioAdvice()" title="Voice Advisory">
                       <span class="material-icons-round">volume_up</span>
                     </button>
                     <div class="select-wrapper select-sm">
@@ -205,25 +357,209 @@
                 </div>
 
                 <div class="report-body" id="reportMarkdown">
-                  <!-- Injected via JavaScript -->
+                  <!-- Injected via JS -->
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- 2. SMART ADVISOR TAB -->
+        <!-- VIEW 3: SOIL ANALYST -->
+        <section class="tab-view" id="tab-soil">
+          <div class="view-header">
+            <h2>Soil Chemistry & Nutrient Lab</h2>
+            <p>Input soil parameters (NPK, pH, Moisture) using interactive sliders and view live nutrient indicators to generate a fertilization prescription.</p>
+          </div>
+
+          <div class="grid-2-col">
+            <!-- Soil Sliders Form -->
+            <div class="card form-card">
+              <h3>Soil Laboratory Parameters</h3>
+              
+              <!-- Nitrogen (N) -->
+              <div class="form-group">
+                <div class="slider-header">
+                  <label for="soilN">Nitrogen (N) <span class="small-unit">(mg/kg)</span></label>
+                  <span class="slider-value-badge bg-emerald" id="valN">60</span>
+                </div>
+                <input type="range" id="soilN" min="0" max="150" value="60" oninput="updateSoilSliders()">
+                <div class="slider-labels">
+                  <span>Deficient</span>
+                  <span>Adequate</span>
+                  <span>Rich</span>
+                </div>
+              </div>
+
+              <!-- Phosphorus (P) -->
+              <div class="form-group">
+                <div class="slider-header">
+                  <label for="soilP">Phosphorus (P) <span class="small-unit">(mg/kg)</span></label>
+                  <span class="slider-value-badge bg-emerald" id="valP">30</span>
+                </div>
+                <input type="range" id="soilP" min="0" max="100" value="30" oninput="updateSoilSliders()">
+                <div class="slider-labels">
+                  <span>Deficient</span>
+                  <span>Adequate</span>
+                  <span>Rich</span>
+                </div>
+              </div>
+
+              <!-- Potassium (K) -->
+              <div class="form-group">
+                <div class="slider-header">
+                  <label for="soilK">Potassium (K) <span class="small-unit">(mg/kg)</span></label>
+                  <span class="slider-value-badge bg-emerald" id="valK">120</span>
+                </div>
+                <input type="range" id="soilK" min="0" max="200" value="120" oninput="updateSoilSliders()">
+                <div class="slider-labels">
+                  <span>Deficient</span>
+                  <span>Adequate</span>
+                  <span>Rich</span>
+                </div>
+              </div>
+
+              <!-- pH Level -->
+              <div class="form-group">
+                <div class="slider-header">
+                  <label for="soilPh">Soil pH</label>
+                  <span class="slider-value-badge bg-amber" id="valPh">6.5</span>
+                </div>
+                <input type="range" id="soilPh" min="3" max="10" step="0.1" value="6.5" oninput="updateSoilSliders()">
+                <div class="slider-labels">
+                  <span>Acidic (3)</span>
+                  <span>Neutral (7)</span>
+                  <span>Alkaline (10)</span>
+                </div>
+              </div>
+
+              <!-- Moisture Level -->
+              <div class="form-group">
+                <div class="slider-header">
+                  <label for="soilMoisture">Moisture Content</label>
+                  <span class="slider-value-badge bg-sky" id="valMoisture">45%</span>
+                </div>
+                <input type="range" id="soilMoisture" min="0" max="100" value="45" oninput="updateSoilSliders()">
+                <div class="slider-labels">
+                  <span>Dry</span>
+                  <span>Optimal</span>
+                  <span>Saturated</span>
+                </div>
+              </div>
+
+              <!-- Crop to grow -->
+              <div class="form-group">
+                <label for="soilCrop">Intended Crop</label>
+                <div class="select-wrapper">
+                  <select id="soilCrop">
+                    <option value="Tomato">Tomato</option>
+                    <option value="Potato">Potato</option>
+                    <option value="Rice">Rice</option>
+                    <option value="Wheat">Wheat</option>
+                    <option value="Maize">Maize / Corn</option>
+                    <option value="Other">Other / Unknown</option>
+                  </select>
+                </div>
+              </div>
+
+              <button class="btn btn-primary btn-block ripple" id="soilBtn" onclick="runSoilPrescription()">
+                <span class="material-icons-round">auto_fix_high</span>
+                <span>Generate Fertilization Plan</span>
+              </button>
+            </div>
+
+            <!-- Gauges and Prescription Report -->
+            <div class="card result-card" id="soilResult">
+              
+              <!-- Initial Gauges Display Workspace -->
+              <div class="soil-gauges-container" id="soilGaugesWorkspace">
+                <h3>Live Nutrient Ratios</h3>
+                
+                <!-- Circular Soil Quality Gauge -->
+                <div class="circular-gauge-box">
+                  <div class="circle-svg-wrap">
+                    <svg viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="40" class="gauge-bg"></circle>
+                      <circle cx="50" cy="50" r="40" class="gauge-fill" id="soilHealthCircle" stroke-dasharray="251" stroke-dashoffset="50"></circle>
+                    </svg>
+                    <div class="gauge-percentage-text">
+                      <h4 id="soilHealthText">80%</h4>
+                      <p>Health Index</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Linear Indicators -->
+                <div class="linear-gauges-list">
+                  <div class="linear-gauge-row">
+                    <div class="gauge-label">
+                      <span>Nitrogen (N)</span>
+                      <strong id="gaugeTextN">Optimal</strong>
+                    </div>
+                    <div class="linear-bar"><div class="bar-fill" id="gaugeBarN" style="width: 50%;"></div></div>
+                  </div>
+
+                  <div class="linear-gauge-row">
+                    <div class="gauge-label">
+                      <span>Phosphorus (P)</span>
+                      <strong id="gaugeTextP">Optimal</strong>
+                    </div>
+                    <div class="linear-bar"><div class="bar-fill" id="gaugeBarP" style="width: 45%;"></div></div>
+                  </div>
+
+                  <div class="linear-gauge-row">
+                    <div class="gauge-label">
+                      <span>Potassium (K)</span>
+                      <strong id="gaugeTextK">Optimal</strong>
+                    </div>
+                    <div class="linear-bar"><div class="bar-fill" id="gaugeBarK" style="width: 60%;"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Prescription loading states -->
+              <div class="skeleton-loader-container" id="soilLoading" style="display: none; margin-top: 20px;">
+                <div class="skeleton-bar title-bar"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line short-line"></div>
+              </div>
+
+              <!-- Prescription Output -->
+              <div class="report-content" id="soilPrescriptionContent" style="display: none; margin-top: 20px;">
+                <div class="report-header">
+                  <div class="report-title-area">
+                    <span class="report-badge">Fertilization Plan</span>
+                    <h3>Soil Prescription Report</h3>
+                    <p id="soilReportMeta">Date: June 1, 2026</p>
+                  </div>
+                  
+                  <!-- Toggle view back to Gauges -->
+                  <button class="btn btn-secondary btn-sm" onclick="showSoilGaugesOnly()">
+                    <span class="material-icons-round">analytics</span>
+                    <span>Show Gauges</span>
+                  </button>
+                </div>
+                <div class="report-body" id="soilPrescriptionMarkdown">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 4: WEATHER ADVISORY -->
         <section class="tab-view" id="tab-advisor">
           <div class="view-header">
-            <h2>Weather-Aware Smart Advisory</h2>
-            <p>Enter your crop and location to receive weather forecasts and custom advisory checklists (irrigation, fertilization, etc.).</p>
+            <h2>Microclimate Advisory Center</h2>
+            <p>Synthesize local weather factors to schedule farm irrigation cycles, spraying windows, and weed operations.</p>
           </div>
 
           <div class="grid-2-col">
             <!-- Advisory Input -->
             <div class="card form-card">
               <div class="form-group">
-                <label for="advisorCrop">Crop Type</label>
+                <label for="advisorCrop">Active Crop</label>
                 <div class="select-wrapper">
                   <select id="advisorCrop">
                     <option value="">-- Choose Crop --</option>
@@ -240,42 +576,43 @@
               </div>
 
               <div class="form-group">
-                <label for="advisorLocation">Location (City / State / Region)</label>
+                <label for="advisorLocation">Farming Location</label>
                 <div class="input-icon-wrapper">
                   <span class="material-icons-round input-icon">place</span>
-                  <input type="text" id="advisorLocation" placeholder="e.g., Pune, Maharashtra or Hyderabad, Telangana">
+                  <input type="text" id="advisorLocation" placeholder="e.g. Pune, Maharashtra or Guntur, AP">
                 </div>
               </div>
 
-              <button class="btn btn-primary btn-block" id="advisorBtn" onclick="runAdvisory()">
-                <span class="material-icons-round">cloud</span>
-                <span>Get Weather & Advisory</span>
+              <button class="btn btn-primary btn-block ripple" id="advisorBtn" onclick="runAdvisory()">
+                <span class="material-icons-round">cloud_queue</span>
+                <span>Generate Weather Advisory</span>
               </button>
             </div>
 
-            <!-- Advisory Result Card -->
+            <!-- Result Card -->
             <div class="card result-card" id="advisorResult">
               <div class="result-placeholder" id="advisorPlaceholder">
-                <span class="material-icons-round">cloud_queue</span>
-                <h3>Weather Advisory Ready</h3>
-                <p>Provide your crop and location, then click the button to load live/simulated agricultural forecasts.</p>
+                <span class="material-icons-round">thermostat</span>
+                <h3>Weather Advisory Dashboard</h3>
+                <p>Provide crop and location details to generate detailed microclimatic schedules.</p>
               </div>
 
-              <div class="result-loading" id="advisorLoading" style="display: none;">
-                <div class="spinner"></div>
-                <h3>Fetching Weather & Advice</h3>
-                <p>Processing meteorological factors and crop growth cycles...</p>
+              <div class="skeleton-loader-container" id="advisorLoading" style="display: none;">
+                <div class="skeleton-bar title-bar"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line short-line"></div>
               </div>
 
-              <!-- Actual Advisory Structure -->
+              <!-- Advisory -->
               <div class="report-content" id="advisorContent" style="display: none;">
-                <!-- Weather Widget -->
+                <!-- Weather info widget -->
                 <div class="weather-widget-card" id="weatherWidget">
                   <div class="weather-main">
                     <span class="material-icons-round weather-icon" id="weatherIcon">wb_sunny</span>
                     <div>
                       <h3 id="weatherTemp">32°C</h3>
-                      <p id="weatherDesc">Partly Cloudy</p>
+                      <p id="weatherDesc">Sunny</p>
                     </div>
                   </div>
                   <div class="weather-meta">
@@ -283,53 +620,79 @@
                       <span class="material-icons-round">water_drop</span>
                       <div>
                         <span>Humidity</span>
-                        <strong id="weatherHumidity">65%</strong>
+                        <strong id="weatherHumidity">60%</strong>
                       </div>
                     </div>
                     <div class="meta-item">
                       <span class="material-icons-round">air</span>
                       <div>
                         <span>Wind Speed</span>
-                        <strong id="weatherWind">12 km/h</strong>
+                        <strong id="weatherWind">14 km/h</strong>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div class="report-body" id="advisorMarkdown" style="margin-top: 20px;">
-                  <!-- Injected via JavaScript -->
+                <div class="report-body" id="advisorMarkdown" style="margin-top: 15px;">
+                  <!-- Injected via JS -->
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- 3. ASK EXPERT AI (CHAT) TAB -->
+        <!-- VIEW 5: ASK EXPERT CHAT -->
         <section class="tab-view" id="tab-chat">
           <div class="view-header">
-            <h2>Ask Farm-Q Expert AI</h2>
-            <p>Ask anything about seeds, soil testing, fertilizer application, irrigation practices, or crop protection.</p>
+            <h2>Botanical Consultation Core</h2>
+            <p>Engage in real-time chat with the Farm-Q Expert AI regarding soil improvements, irrigation systems, or pest treatments.</p>
           </div>
 
           <div class="card chat-card-container">
-            <!-- Chat Window -->
             <div class="chat-window-box" id="chatWindow">
               <div class="chat-message bot">
                 <div class="chat-avatar">
                   <span class="material-icons-round">spa</span>
                 </div>
                 <div class="chat-bubble">
-                  <p>Hello! I am your Farm-Q Agricultural Advisor. How can I help you today? You can ask me about soil health, pest control, irrigation, or fertilizer guidance.</p>
+                  <p>Welcome to the Botanical Consultation terminal. Ask me any specialized farming question, and I will generate structured answers.</p>
                 </div>
               </div>
             </div>
 
-            <!-- Chat Inputs -->
             <div class="chat-input-bar">
-              <input type="text" id="chatInput" placeholder="Ask a question about your farm..." onkeydown="handleChatKey(event)">
-              <button class="btn btn-primary btn-round" onclick="sendChatMessage()">
+              <input type="text" id="chatInput" placeholder="Enter agricultural question..." onkeydown="handleChatKey(event)">
+              <button class="btn btn-primary btn-round ripple" onclick="sendChatMessage()">
                 <span class="material-icons-round">send</span>
               </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 6: ORGANIC RECIPE BOOK -->
+        <section class="tab-view" id="tab-recipes">
+          <div class="view-header">
+            <h2>Organic Treatment Recipe Book</h2>
+            <p>Search and read detailed preparation instructions for natural pest repellents, compost brews, and growth promoters.</p>
+          </div>
+
+          <div class="recipe-workspace card">
+            <div class="recipe-filter-bar">
+              <div class="input-icon-wrapper" style="flex: 1;">
+                <span class="material-icons-round input-icon">search</span>
+                <input type="text" id="recipeSearch" placeholder="Search ingredient or recipe (e.g. Neem, compost)..." oninput="filterRecipes()">
+              </div>
+              <div class="recipe-tabs" id="recipeTabs">
+                <button class="recipe-tab-btn active" onclick="switchRecipeTab('all')">All</button>
+                <button class="recipe-tab-btn" onclick="switchRecipeTab('pest')">Pest Repellents</button>
+                <button class="recipe-tab-btn" onclick="switchRecipeTab('disease')">Disease Cures</button>
+                <button class="recipe-tab-btn" onclick="switchRecipeTab('soil')">Soil Boosters</button>
+              </div>
+            </div>
+
+            <!-- Scrollable Recipes list -->
+            <div class="recipes-grid" id="recipesListGrid">
+              <!-- Injected via JS -->
             </div>
           </div>
         </section>
@@ -344,19 +707,19 @@
       <div class="modal-header">
         <div class="modal-title">
           <span class="material-icons-round text-primary">key</span>
-          <h2>Gemini API Credentials</h2>
+          <h2>Gemini API Setup</h2>
         </div>
         <button class="icon-btn" onclick="closeSettings()">
           <span class="material-icons-round">close</span>
         </button>
       </div>
       <div class="modal-body">
-        <p>To enable real-time AI capabilities, configure a Google Gemini API Key. Your key is stored securely in your local browser cache (`localStorage`) and is never sent to any external server other than Google's Gemini endpoint.</p>
+        <p>This application executes fully client-side. To activate AI capabilities, save your Gemini API Key below. The key remains stored inside your browser's private `localStorage` cache.</p>
         
         <div class="form-group" style="margin-top: 15px;">
           <label for="apiKeyInput">Gemini API Key</label>
           <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
-          <p class="input-help-text">You can get a free API key from the <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a>.</p>
+          <p class="input-help-text">Obtain a free API key from <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a>.</p>
         </div>
       </div>
       <div class="modal-footer">
