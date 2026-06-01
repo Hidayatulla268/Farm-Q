@@ -41,7 +41,7 @@ Farm-Q is a professional, mobile-friendly web application designed to empower fa
   - Modern glassmorphism panel styles.
   - Dual light and dark modes.
 - **Application Logic**: Vanilla JavaScript (ES6+)
-- **AI Engine**: Google Gemini API via lightweight client-side REST fetching (utilizing `gemini-2.5-flash` for high-speed multimodal processing).
+- **AI Engine**: Google Gemini API via lightweight client-side REST fetching (utilizing `gemini-2.0-flash` for high-speed multimodal processing).
 - **Voice Engine**: HTML5 Speech Synthesis Web API.
 
 ---
